@@ -23,6 +23,10 @@ public class UsuarioService {
     public Optional<Usuario> obtenerPorId(Long idUsuario) {
         return usuarioRepository.findById(idUsuario);
     }
+    
+    public Optional<Usuario> obtenerPorRut(String rutUsuario) {
+        return usuarioRepository.findByRutUsuario(rutUsuario);
+    }
 
     public Usuario registrarUsuario(Usuario usuario) {
         return usuarioRepository.save(usuario);
@@ -47,6 +51,5 @@ public class UsuarioService {
     public void eliminarUsuario(Long idUsuario){
         this.usuarioRepository.deleteById(idUsuario);
     }
-
  
 }

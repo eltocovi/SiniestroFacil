@@ -26,31 +26,39 @@ public class UsuarioController {
         this.usuarioService = usuarioService;
     }
 
-    @GetMapping("/listar")
+    @GetMapping
     public ResponseEntity<List<Usuario>> obtenerUsuarios() {
         return ResponseEntity.ok(usuarioService.obtenerUsuarios());
     }
 
-    @GetMapping("/buscar/{idUsuario}")
+    @GetMapping("{idUsuario}")
     public ResponseEntity<Usuario> obtenerPorId(@PathVariable Long idUsuario) {
         return usuarioService.obtenerPorId(idUsuario)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping("/registrar")
+    @GetMapping("/rut/{rutUsuario}")
+    public ResponseEntity<Usuario> obtenerPorRut(@PathVariable String rutUsuario) {
+
+        return usuarioService.obtenerPorRut(rutUsuario)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping
     public ResponseEntity<Usuario> registrarUsuario(@RequestBody Usuario usuario) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(usuarioService.registrarUsuario(usuario));
     }
 
-    @PatchMapping ("/modificar/{idusuario}")
+    @PatchMapping ("{idusuario}")
     public ResponseEntity<Usuario> actualizarUsuario(@RequestBody Usuario usuario, @PathVariable Long idUsuario) {
         Usuario usuarioActualizado = usuarioService.actualizarUsuario(usuario, idUsuario);
         return ResponseEntity.ok(usuarioActualizado);
     }
 
-    @DeleteMapping("/eliminar/{idUsuario}")
+    @DeleteMapping("{idUsuario}")
     public ResponseEntity<?> eliminarUsuario(@PathVariable Long idUsuario) {
         usuarioService.eliminarUsuario(idUsuario);
         return ResponseEntity.noContent().build();   
