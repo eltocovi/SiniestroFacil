@@ -13,11 +13,8 @@ import java.util.List;
 @RequestMapping("/api/v1/denuncias")
 public class DenunciaController {
 
-    private final DenunciaService denunciaService;
-
-    public DenunciaController(DenunciaService denunciaService) {
-        this.denunciaService = denunciaService;
-    }
+    @Autowired
+    private DenunciaService denunciaService;
 
     @PostMapping
     public ResponseEntity<Denuncia> registrarDenuncia(@Valid @RequestBody Denuncia denuncia) {

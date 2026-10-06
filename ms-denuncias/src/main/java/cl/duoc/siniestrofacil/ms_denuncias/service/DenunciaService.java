@@ -12,7 +12,8 @@ import java.util.UUID;
 @Service
 public class DenunciaService {
 
-    private final DenunciaRepository denunciaRepository;
+    @Autowired
+    private DenunciaRepository denunciaRepository;
 
     public DenunciaService(DenunciaRepository denunciaRepository) {
         this.denunciaRepository = denunciaRepository;
