@@ -3,6 +3,7 @@ package cl.duoc.siniestrofacil.ms_denuncias.controller;
 import cl.duoc.siniestrofacil.ms_denuncias.model.Denuncia;
 import cl.duoc.siniestrofacil.ms_denuncias.service.DenunciaService;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

@@ -1,7 +1,9 @@
 package cl.duoc.siniestrofacil.ms_denuncias.service;
 
 import cl.duoc.siniestrofacil.ms_denuncias.model.Denuncia;
+import cl.duoc.siniestrofacil.ms_denuncias.model.Fotografia;
 import cl.duoc.siniestrofacil.ms_denuncias.repository.DenunciaRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -15,14 +17,16 @@ public class DenunciaService {
     @Autowired
     private DenunciaRepository denunciaRepository;
 
-    public DenunciaService(DenunciaRepository denunciaRepository) {
-        this.denunciaRepository = denunciaRepository;
-    }
-
     public Denuncia registrarDenuncia(Denuncia denuncia) {
         denuncia.setFolio(UUID.randomUUID().toString().substring(0, 8).toUpperCase());
         denuncia.setFechaRegistro(LocalDateTime.now());
         denuncia.setEstado("PENDIENTE_ASIGNACION");
+
+        if (denuncia.getFotografias() != null) {
+            for (Fotografia foto : denuncia.getFotografias()) {
+                foto.setDenuncia(denuncia);
+            }
+        }
 
         return denunciaRepository.save(denuncia);
     }
