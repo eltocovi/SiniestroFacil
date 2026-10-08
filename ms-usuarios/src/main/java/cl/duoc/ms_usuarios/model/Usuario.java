@@ -54,7 +54,7 @@ public class Usuario {
     private Boolean estado;
 
     @ManyToOne
-@   JoinColumn(name = "id_rol", nullable = false)
+    @JoinColumn(name = "id_rol", nullable = false)
     @JsonBackReference
     private Rol rol;
 
