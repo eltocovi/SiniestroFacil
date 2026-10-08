@@ -6,6 +6,8 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,7 +20,12 @@ public class DenunciaController {
     private DenunciaService denunciaService;
 
     @PostMapping
-    public ResponseEntity<Denuncia> registrarDenuncia(@Valid @RequestBody Denuncia denuncia) {
+    public ResponseEntity<Denuncia> registrarDenuncia(
+            @Valid @RequestBody Denuncia denuncia,
+            JwtAuthenticationToken token) {
+
+        String correoUsuario = token.getName();
+
         return new ResponseEntity<>(denunciaService.registrarDenuncia(denuncia), HttpStatus.CREATED);
     }
 
@@ -34,6 +41,7 @@ public class DenunciaController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PatchMapping("/{id}/estado")
     public ResponseEntity<Denuncia> actualizarEstado(@PathVariable Long id, @RequestParam String estado) {
         try {
@@ -43,6 +51,7 @@ public class DenunciaController {
         }
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarDenuncia(@PathVariable Long id) {
         denunciaService.eliminarDenuncia(id);
