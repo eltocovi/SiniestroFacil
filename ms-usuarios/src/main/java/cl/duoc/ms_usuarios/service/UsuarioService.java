@@ -46,8 +46,7 @@ public class UsuarioService {
     
     public Usuario actualizarUsuario(Usuario usuario, Long idUsuario) {
 
-    Usuario usuarioExistente = usuarioRepository.findById(idUsuario)
-                            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+    Usuario usuarioExistente = usuarioRepository.findById(idUsuario).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         usuarioExistente.setRutUsuario(usuario.getRutUsuario());
         usuarioExistente.setEdad(usuario.getEdad());
@@ -62,5 +61,12 @@ public class UsuarioService {
 
     public void eliminarUsuario(Long idUsuario){
         this.usuarioRepository.deleteById(idUsuario);
+    }
+
+    public Usuario cambiarEstadoUsuario(Long idUsuario, Boolean estado) {
+
+    Usuario usuario = usuarioRepository.findById(idUsuario).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+    usuario.setEstado(estado);
+    return usuarioRepository.save(usuario);
     }
 }
