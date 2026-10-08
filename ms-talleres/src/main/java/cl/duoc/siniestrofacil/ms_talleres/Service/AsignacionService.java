@@ -15,5 +15,5 @@ public interface AsignacionService {
     AsignacionResponse confirmarRecepcion(Long id, String observaciones);
     AsignacionResponse cambiarEstado(Long id, EstadoAsignacion nuevoEstado);    
 
-    Void eliminar(Long id);
+    void eliminar(Long id);
 }
