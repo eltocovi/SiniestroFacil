@@ -7,10 +7,7 @@ import cl.duoc.siniestrofacil.ms_talleres.model.Taller;
 import cl.duoc.siniestrofacil.ms_talleres.util.RutUtil;
 import org.springframework.stereotype.Component;
 
-/**
- * Convierte entidades JPA a DTOs de respuesta, evitando exponer el modelo
- * de persistencia (y las referencias circulares de la relación) en la API.
- */
+
 @Component
 public class TallerMapper {
 

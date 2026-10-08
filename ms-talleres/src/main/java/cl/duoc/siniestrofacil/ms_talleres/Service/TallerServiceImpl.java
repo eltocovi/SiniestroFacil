@@ -21,7 +21,6 @@ public class TallerServiceImpl implements TallerService {
     private final TallerRepository tallerRepository;
     private final TallerMapper tallerMapper;
 
-    // Inyección de dependencias por constructor
     public TallerServiceImpl(TallerRepository tallerRepository, TallerMapper tallerMapper) {
         this.tallerRepository = tallerRepository;
         this.tallerMapper = tallerMapper;
@@ -120,7 +119,6 @@ public class TallerServiceImpl implements TallerService {
         tallerRepository.delete(taller);
     }
 
-    /** Verifica con módulo 11 que el dígito verificador corresponda al RUT y lo devuelve en mayúscula. */
     private String validarRut(TallerRequest request) {
         String digitoVerificador = request.digitoVerificador().toUpperCase();
         if (!RutUtil.esValido(request.rut(), digitoVerificador)) {
