@@ -1,4 +1,4 @@
-package cl.duoc.siniestrofacil.ms_talleres.Service;
+package cl.duoc.siniestrofacil.ms_talleres.service;
 
 import java.util.List;
 
