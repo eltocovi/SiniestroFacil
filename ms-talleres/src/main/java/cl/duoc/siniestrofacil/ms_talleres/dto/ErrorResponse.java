@@ -13,5 +13,6 @@ public record ErrorResponse(
         String mensaje,
         String path,
         Map<String, String> errores
+        
 ) {
 }
