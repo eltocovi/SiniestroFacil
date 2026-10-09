@@ -1,0 +1,54 @@
+# ============================================================
+# SiniestroFácil - Levanta MySQL + microservicios en Docker
+#   docker compose up -d --build     -> construye y levanta todo
+#   docker compose logs -f ms-poliza -> ver logs de un servicio
+#   docker compose down              -> detiene y elimina los contenedores
+# ============================================================
+services:
+
+  # Base de datos MySQL compartida (cada microservicio crea su propia base: db_poliza, db_talleres)
+  mysql:
+    image: mysql:8.4
+    container_name: siniestrofacil-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3307:3306"   # 3307 en tu PC para no chocar con el MySQL de XAMPP (3306)
+    volumes:
+      - mysql_data:/var/lib/mysql   # los datos persisten aunque se borre el contenedor
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  ms-poliza:
+    build: ./ms-poliza
+    container_name: ms-poliza
+    ports:
+      - "8084:8084"
+    environment:
+      DB_HOST: mysql          # nombre del servicio MySQL dentro de la red de Docker
+      DB_PORT: 3306
+      DB_USERNAME: root
+      DB_PASSWORD: root
+    depends_on:
+      mysql:
+        condition: service_healthy   # espera a que MySQL esté listo antes de arrancar
+
+  ms-talleres:
+    build: ./ms-talleres
+    container_name: ms-talleres
+    ports:
+      - "8083:8083"
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USERNAME: root
+      DB_PASSWORD: root
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+volumes:
+  mysql_data:
