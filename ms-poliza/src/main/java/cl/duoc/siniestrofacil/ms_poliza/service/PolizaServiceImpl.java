@@ -12,7 +12,6 @@ import cl.duoc.siniestrofacil.ms_poliza.model.Poliza;
 import cl.duoc.siniestrofacil.ms_poliza.model.TipoCobertura;
 import cl.duoc.siniestrofacil.ms_poliza.repository.AseguradoRepository;
 import cl.duoc.siniestrofacil.ms_poliza.repository.PolizaRepository;
-import cl.duoc.siniestrofacil.ms_poliza.util.RutUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -227,7 +226,7 @@ public class PolizaServiceImpl implements PolizaService {
                 poliza.estadoA(fecha),
                 poliza.getFechaInicio(),
                 poliza.getFechaTermino(),
-                RutUtil.formatear(asegurado.getRut(), asegurado.getDv()),
+                asegurado.getRut() + "-" + asegurado.getDv(),
                 asegurado.getNombre(),
                 poliza.getDeducible(),
                 polizaMapper.toResponse(poliza.getCoberturas()));

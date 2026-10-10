@@ -4,7 +4,6 @@ import cl.duoc.siniestrofacil.ms_talleres.dto.AsignacionResponse;
 import cl.duoc.siniestrofacil.ms_talleres.dto.TallerResponse;
 import cl.duoc.siniestrofacil.ms_talleres.model.Asignacion;
 import cl.duoc.siniestrofacil.ms_talleres.model.Taller;
-import cl.duoc.siniestrofacil.ms_talleres.util.RutUtil;
 import org.springframework.stereotype.Component;
 
 
@@ -17,7 +16,7 @@ public class TallerMapper {
                 taller.getNombre(),
                 taller.getRut(),
                 taller.getDv(),
-                RutUtil.formatear(taller.getRut(), taller.getDv()),
+                taller.getRut() + "-" + taller.getDv(),
                 taller.getDireccion(),
                 taller.getComuna(),
                 taller.getTelefono(),

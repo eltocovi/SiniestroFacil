@@ -5,7 +5,6 @@ import cl.duoc.siniestrofacil.ms_poliza.dto.AseguradoResponse;
 import cl.duoc.siniestrofacil.ms_poliza.dto.PolizaResponse;
 import cl.duoc.siniestrofacil.ms_poliza.model.Asegurado;
 import cl.duoc.siniestrofacil.ms_poliza.repository.AseguradoRepository;
-import cl.duoc.siniestrofacil.ms_poliza.util.RutUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -96,12 +95,12 @@ public class AseguradoServiceImpl implements AseguradoService {
         aseguradoRepository.delete(asegurado);
     }
 
-    /** Verifica con módulo 11 que el dígito verificador corresponda al RUT y lo devuelve en mayúscula. */
+    /** Valida el RUT con el formato de ms-usuarios (12345678-K) y devuelve el dígito verificador en mayúscula. */
     private String validarRut(AseguradoRequest request) {
         String dv = request.digitoVerificador().toUpperCase();
-        if (!RutUtil.esValido(request.rut(), dv)) {
+        if (!(request.rut() + "-" + dv).matches("\\d{7,8}-[0-9Kk]")) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_CONTENT,
-                    "El dígito verificador " + dv + " no corresponde al RUT " + request.rut());
+                    "El formato del RUT no es válido");
         }
         return dv;
     }

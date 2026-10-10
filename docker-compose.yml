@@ -1,54 +1,129 @@
-# ============================================================
-# SiniestroFácil - Levanta MySQL + microservicios en Docker
-#   docker compose up -d --build     -> construye y levanta todo
-#   docker compose logs -f ms-poliza -> ver logs de un servicio
-#   docker compose down              -> detiene y elimina los contenedores
-# ============================================================
 services:
-
-  # Base de datos MySQL compartida (cada microservicio crea su propia base: db_poliza, db_talleres)
-  mysql:
-    image: mysql:8.4
-    container_name: siniestrofacil-mysql
+  # ==========================================
+  # 1. MICROSERVICIO DENUNCIAS
+  # ==========================================
+  mysql-denuncias:
+    image: mysql:8.0
+    container_name: mysql-denuncias
     environment:
       MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: db_denuncias
     ports:
-      - "3307:3306"   # 3307 en tu PC para no chocar con el MySQL de XAMPP (3306)
-    volumes:
-      - mysql_data:/var/lib/mysql   # los datos persisten aunque se borre el contenedor
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-proot"]
-      interval: 5s
-      timeout: 5s
-      retries: 20
+      - "3307:3306" # Puerto externo 3307
+    networks:
+      - siniestro-network
 
-  ms-poliza:
-    build: ./ms-poliza
-    container_name: ms-poliza
+  ms-denuncias:
+    build:
+      context: ./ms-denuncias
+      dockerfile: Dockerfile
+    container_name: ms-denuncias
     ports:
-      - "8084:8084"
+      - "8081:8081"
     environment:
-      DB_HOST: mysql          # nombre del servicio MySQL dentro de la red de Docker
-      DB_PORT: 3306
-      DB_USERNAME: root
-      DB_PASSWORD: root
+      - DB_HOST=mysql-denuncias
+      - DB_PORT=3306
+      - DB_USERNAME=root
+      - DB_PASSWORD=root
     depends_on:
-      mysql:
-        condition: service_healthy   # espera a que MySQL esté listo antes de arrancar
+      - mysql-denuncias
+    networks:
+      - siniestro-network
+
+  # ==========================================
+  # 2. MICROSERVICIO USUARIOS
+  # ==========================================
+  mysql-usuarios:
+    image: mysql:8.0
+    container_name: mysql-usuarios
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: db_usuarios
+    ports:
+      - "3306:3306" # Puerto externo 3306
+    networks:
+      - siniestro-network
+
+  ms-usuarios:
+    build:
+      context: ./ms-usuarios
+      dockerfile: Dockerfile
+    container_name: ms-usuarios
+    ports:
+      - "8082:8082"
+    environment:
+      - DB_HOST=mysql-usuarios
+      - DB_PORT=3306
+      - DB_USERNAME=root
+      - DB_PASSWORD=root
+    depends_on:
+      - mysql-usuarios
+    networks:
+      - siniestro-network
+
+  # ==========================================
+  # 3. MICROSERVICIO TALLERES
+  # ==========================================
+  mysql-talleres:
+    image: mysql:8.0
+    container_name: mysql-talleres
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: db_talleres
+    ports:
+      - "3308:3306" # Puerto externo 3308
+    networks:
+      - siniestro-network
 
   ms-talleres:
-    build: ./ms-talleres
+    build:
+      context: ./ms-talleres
+      dockerfile: Dockerfile
     container_name: ms-talleres
     ports:
       - "8083:8083"
     environment:
-      DB_HOST: mysql
-      DB_PORT: 3306
-      DB_USERNAME: root
-      DB_PASSWORD: root
+      - DB_HOST=mysql-talleres
+      - DB_PORT=3306
+      - DB_USERNAME=root
+      - DB_PASSWORD=root
     depends_on:
-      mysql:
-        condition: service_healthy
+      - mysql-talleres
+    networks:
+      - siniestro-network
 
-volumes:
-  mysql_data:
+  # ==========================================
+  # 4. MICROSERVICIO POLIZA
+  # ==========================================
+  mysql-poliza:
+    image: mysql:8.0
+    container_name: mysql-poliza
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: db_poliza
+    ports:
+      - "3309:3306" # Puerto externo 3309
+    networks:
+      - siniestro-network
+
+  ms-poliza:
+    build:
+      context: ./ms-poliza
+      dockerfile: Dockerfile
+    container_name: ms-poliza
+    ports:
+      - "8084:8084"
+    environment:
+      - DB_HOST=mysql-poliza
+      - DB_PORT=3306
+      - DB_USERNAME=root
+      - DB_PASSWORD=root
+    depends_on:
+      - mysql-poliza
+    networks:
+      - siniestro-network
+
+# Red interna que permite a los contenedores hablar entre sí
+networks:
+  siniestro-network:
+    driver: bridge
