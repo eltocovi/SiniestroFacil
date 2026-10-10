@@ -1,0 +1,17 @@
+INSERT INTO rol (nombre)
+SELECT 'ASEGURADO'
+WHERE NOT EXISTS (
+    SELECT 1 FROM rol WHERE nombre = 'ASEGURADO'
+);
+
+INSERT INTO rol (nombre)
+SELECT 'TALLER'
+WHERE NOT EXISTS (
+    SELECT 1 FROM rol WHERE nombre = 'TALLER'
+);
+
+INSERT INTO rol (nombre)
+SELECT 'ADMIN'
+WHERE NOT EXISTS (
+    SELECT 1 FROM rol WHERE nombre = 'ADMIN'
+);
