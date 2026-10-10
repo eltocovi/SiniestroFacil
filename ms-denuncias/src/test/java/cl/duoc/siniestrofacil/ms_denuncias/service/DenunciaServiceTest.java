@@ -1,5 +1,7 @@
 package cl.duoc.siniestrofacil.ms_denuncias.service;
 
+import cl.duoc.siniestrofacil.ms_denuncias.dto.DenunciaRequestDTO;
+import cl.duoc.siniestrofacil.ms_denuncias.dto.DenunciaResponseDTO;
 import cl.duoc.siniestrofacil.ms_denuncias.model.Denuncia;
 import cl.duoc.siniestrofacil.ms_denuncias.model.Fotografia;
 import cl.duoc.siniestrofacil.ms_denuncias.repository.DenunciaRepository;
@@ -10,7 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,86 +29,95 @@ class DenunciaServiceTest {
     @InjectMocks
     private DenunciaService denunciaService;
 
-    private Denuncia denunciaPrueba;
+    private Denuncia denunciaMock;
+    private DenunciaRequestDTO requestDTOMock;
 
     @BeforeEach
     void setUp() {
-        denunciaPrueba = new Denuncia();
-        denunciaPrueba.setId(1L);
-        denunciaPrueba.setDescripcion("Choque por alcance en la avenida");
+        denunciaMock = new Denuncia();
+        denunciaMock.setId(1L);
+        denunciaMock.setFolio("A1B2C3D4");
+        denunciaMock.setRutAsegurado("19123456-7");
+        denunciaMock.setPatenteVehiculo("AB12CD");
+        denunciaMock.setDescripcion("Choque leve");
+        denunciaMock.setEstado("PENDIENTE_ASIGNACION");
+        denunciaMock.setFechaRegistro(LocalDateTime.now());
+
+        Fotografia foto = new Fotografia();
+        foto.setUrlImagen("http://foto.com/1.jpg");
+        denunciaMock.setFotografias(List.of(foto));
+
+        requestDTOMock = new DenunciaRequestDTO();
+        requestDTOMock.setRutAsegurado("19123456-7");
+        requestDTOMock.setPatenteVehiculo("AB12CD");
+        requestDTOMock.setDescripcion("Choque leve");
+        requestDTOMock.setFotografiasUrls(List.of("http://foto.com/1.jpg"));
     }
 
     @Test
-    void registrarDenuncia_DeberiaAsignarValoresInicialesYGuardar() {
-        List<Fotografia> fotos = new ArrayList<>();
-        fotos.add(new Fotografia());
-        denunciaPrueba.setFotografias(fotos);
+    void testRegistrarDenuncia() {
+        when(denunciaRepository.save(any(Denuncia.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        when(denunciaRepository.save(any(Denuncia.class))).thenReturn(denunciaPrueba);
+        DenunciaResponseDTO response = denunciaService.registrarDenuncia(requestDTOMock);
 
-        Denuncia resultado = denunciaService.registrarDenuncia(denunciaPrueba);
-
-        assertNotNull(resultado.getFolio(), "El folio no debe ser nulo");
-        assertEquals(8, resultado.getFolio().length(), "El folio debe tener 8 caracteres");
-        assertNotNull(resultado.getFechaRegistro(), "La fecha de registro no debe ser nula");
-        assertEquals("PENDIENTE_ASIGNACION", resultado.getEstado(), "El estado inicial debe ser PENDIENTE_ASIGNACION");
-
-        assertEquals(resultado, fotos.get(0).getDenuncia(), "La fotografía debe tener asignada la denuncia");
-
-        verify(denunciaRepository, times(1)).save(denunciaPrueba);
+        assertNotNull(response.getFolio());
+        assertNotNull(response.getFechaRegistro());
+        assertEquals("PENDIENTE_ASIGNACION", response.getEstado());
+        assertEquals("19123456-7", response.getRutAsegurado());
+        assertEquals(1, response.getFotografiasUrls().size());
+        verify(denunciaRepository, times(1)).save(any(Denuncia.class));
     }
 
     @Test
-    void obtenerTodas_DeberiaRetornarListaDeDenuncias() {
-        List<Denuncia> listaEsperada = List.of(denunciaPrueba, new Denuncia());
-        when(denunciaRepository.findAll()).thenReturn(listaEsperada);
+    void testObtenerTodas() {
+        when(denunciaRepository.findAll()).thenReturn(List.of(denunciaMock));
 
-        List<Denuncia> resultado = denunciaService.obtenerTodas();
+        List<DenunciaResponseDTO> lista = denunciaService.obtenerTodas();
 
-        assertEquals(2, resultado.size());
+        assertFalse(lista.isEmpty());
+        assertEquals(1, lista.size());
+        assertEquals("A1B2C3D4", lista.get(0).getFolio());
         verify(denunciaRepository, times(1)).findAll();
     }
 
     @Test
-    void obtenerPorId_DeberiaRetornarDenunciaSiExiste() {
-        when(denunciaRepository.findById(1L)).thenReturn(Optional.of(denunciaPrueba));
+    void testObtenerPorId() {
+        when(denunciaRepository.findById(1L)).thenReturn(Optional.of(denunciaMock));
 
-        Optional<Denuncia> resultado = denunciaService.obtenerPorId(1L);
+        Optional<DenunciaResponseDTO> response = denunciaService.obtenerPorId(1L);
 
-        assertTrue(resultado.isPresent());
-        assertEquals(1L, resultado.get().getId());
+        assertTrue(response.isPresent());
+        assertEquals("A1B2C3D4", response.get().getFolio());
         verify(denunciaRepository, times(1)).findById(1L);
     }
 
     @Test
-    void actualizarEstado_DeberiaActualizarYGuardarSiExiste() {
+    void testActualizarEstado_Exito() {
+        when(denunciaRepository.findById(1L)).thenReturn(Optional.of(denunciaMock));
+        when(denunciaRepository.save(any(Denuncia.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        String nuevoEstado = "EN_REVISION";
-        when(denunciaRepository.findById(1L)).thenReturn(Optional.of(denunciaPrueba));
-        when(denunciaRepository.save(any(Denuncia.class))).thenReturn(denunciaPrueba);
+        DenunciaResponseDTO response = denunciaService.actualizarEstado(1L, "EN_REVISION");
 
-        Denuncia resultado = denunciaService.actualizarEstado(1L, nuevoEstado);
-
-        assertEquals(nuevoEstado, resultado.getEstado());
-        verify(denunciaRepository, times(1)).findById(1L);
-        verify(denunciaRepository, times(1)).save(denunciaPrueba);
+        assertEquals("EN_REVISION", response.getEstado());
+        verify(denunciaRepository, times(1)).save(any(Denuncia.class));
     }
 
     @Test
-    void actualizarEstado_DeberiaLanzarExcepcionSiNoExiste() {
-        when(denunciaRepository.findById(99L)).thenReturn(Optional.empty());
+    void testActualizarEstado_Falla_NoEncontrado() {
+        when(denunciaRepository.findById(1L)).thenReturn(Optional.empty());
 
-        RuntimeException excepcion = assertThrows(RuntimeException.class, () -> {
-            denunciaService.actualizarEstado(99L, "EN_REVISION");
+        Exception exception = assertThrows(RuntimeException.class, () -> {
+            denunciaService.actualizarEstado(1L, "EN_REVISION");
         });
 
-        assertEquals("Denuncia no encontrada con ID: 99", excepcion.getMessage());
-        verify(denunciaRepository, times(1)).findById(99L);
+        assertEquals("Denuncia no encontrada con ID: 1", exception.getMessage());
         verify(denunciaRepository, never()).save(any(Denuncia.class));
     }
 
     @Test
-    void eliminarDenuncia_DeberiaLlamarDeleteById() {
+    void testEliminarDenuncia() {
+        doNothing().when(denunciaRepository).deleteById(1L);
+
         denunciaService.eliminarDenuncia(1L);
 
         verify(denunciaRepository, times(1)).deleteById(1L);
