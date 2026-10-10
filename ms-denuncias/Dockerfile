@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17-jdk AS build
+FROM eclipse-temurin:21-jdk AS build
 
 WORKDIR /app
 
@@ -9,8 +9,7 @@ RUN chmod +x mvnw && ./mvnw -B dependency:go-offline
 COPY src ./src
 RUN ./mvnw -B clean package -DskipTests
 
-Etapa 2: ejecución
-FROM eclipse-temurin:17-jre
+FROM eclipse-temurin:21-jre
 
 WORKDIR /app
 
