@@ -6,7 +6,6 @@ import cl.duoc.siniestrofacil.ms_talleres.dto.TallerRequest;
 import cl.duoc.siniestrofacil.ms_talleres.dto.TallerResponse;
 import cl.duoc.siniestrofacil.ms_talleres.model.Taller;
 import cl.duoc.siniestrofacil.ms_talleres.repository.TallerRepository;
-import cl.duoc.siniestrofacil.ms_talleres.util.RutUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -121,9 +120,8 @@ public class TallerServiceImpl implements TallerService {
 
     private String validarRut(TallerRequest request) {
         String digitoVerificador = request.digitoVerificador().toUpperCase();
-        if (!RutUtil.esValido(request.rut(), digitoVerificador)) {
-            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_CONTENT, "El dígito verificador " + digitoVerificador
-                    + " no corresponde al RUT " + request.rut());
+        if (!(request.rut() + "-" + digitoVerificador).matches("\\d{7,8}-[0-9Kk]")) {
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_CONTENT, "El formato del RUT no es válido");
         }
         return digitoVerificador;
     }

@@ -6,7 +6,6 @@ import cl.duoc.siniestrofacil.ms_poliza.dto.PolizaResponse;
 import cl.duoc.siniestrofacil.ms_poliza.model.Asegurado;
 import cl.duoc.siniestrofacil.ms_poliza.model.Cobertura;
 import cl.duoc.siniestrofacil.ms_poliza.model.Poliza;
-import cl.duoc.siniestrofacil.ms_poliza.util.RutUtil;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -24,7 +23,7 @@ public class PolizaMapper {
                 asegurado.getId(),
                 asegurado.getRut(),
                 asegurado.getDv(),
-                RutUtil.formatear(asegurado.getRut(), asegurado.getDv()),
+                asegurado.getRut() + "-" + asegurado.getDv(),
                 asegurado.getNombre(),
                 asegurado.getEmail(),
                 asegurado.getTelefono(),
@@ -46,7 +45,7 @@ public class PolizaMapper {
                 poliza.getDeducible(),
                 poliza.estadoA(LocalDate.now()),
                 asegurado.getId(),
-                RutUtil.formatear(asegurado.getRut(), asegurado.getDv()),
+                asegurado.getRut() + "-" + asegurado.getDv(),
                 asegurado.getNombre(),
                 toResponse(poliza.getCoberturas()));
     }
