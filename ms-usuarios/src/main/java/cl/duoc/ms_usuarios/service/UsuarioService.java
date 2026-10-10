@@ -38,9 +38,22 @@ public class UsuarioService {
 
     public Usuario registrarUsuario(Usuario usuario) {
 
+        if (usuario.getRutUsuario() == null
+        !usuario.getRutUsuario().matches("\d{7,8}-[0-9Kk]")) {
+            throw new IllegalArgumentException("El formato del RUT no es válido");
+        }
+
+        if (usuario.getCorreo() == null
+        !usuario.getCorreo().matches("^[\w.+-]+@[\w-]+(\.[\w-]+)+$")) {
+            throw new IllegalArgumentException("El formato del correo no es válido");
+        }
+
         usuario.setContrasena(
-        passwordEncoder.encode(usuario.getContrasena())
-    );
+                passwordEncoder.encode(usuario.getContrasena())
+        );
+
+        return usuarioRepository.save(usuario);
+    }
     return usuarioRepository.save(usuario);
     }
     
