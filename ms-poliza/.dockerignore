@@ -1,0 +1,10 @@
+# Archivos que no se envían al build de Docker
+target/
+postman/
+.idea/
+.vscode/
+*.iml
+*.log
+README.md
+Dockerfile
+.dockerignore

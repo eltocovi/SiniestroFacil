@@ -12,8 +12,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import cl.duoc.ms_usuarios.dto.LoginRequestDTO;
@@ -73,9 +74,7 @@ public class UsuarioController {
         );
 
         Usuario usuarioEncontrado = usuarioService.obtenerPorCorreo(request.correo())
-                .orElseThrow(() ->
-                        new RuntimeException("Usuario no encontrado")
-                );
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         String token = jwtService.generarToken(usuarioEncontrado);
 
@@ -99,4 +98,15 @@ public class UsuarioController {
         usuarioService.eliminarUsuario(idUsuario);
         return ResponseEntity.noContent().build();   
    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PatchMapping("/{idUsuario}/estado")
+    public ResponseEntity<Usuario> cambiarEstadoUsuario(
+            @PathVariable Long idUsuario,
+            @RequestParam Boolean estado) {
+
+        return ResponseEntity.ok(
+                usuarioService.cambiarEstadoUsuario(idUsuario, estado)
+        );
+    }   
 }
