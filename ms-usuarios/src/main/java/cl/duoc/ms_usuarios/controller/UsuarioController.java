@@ -27,19 +27,19 @@ public class UsuarioController {
     private JwtService jwtService;
 
 
-    @GetMapping("/api/usuarios")
+    @GetMapping
     public ResponseEntity<List<Usuario>> obtenerUsuarios() {
         return ResponseEntity.ok(usuarioService.obtenerUsuarios());
     }
 
-    @GetMapping("/api/usuarios/{idUsuario}")
+    @GetMapping("{idUsuario}")
     public ResponseEntity<Usuario> obtenerPorId(@PathVariable Long idUsuario) {
         return usuarioService.obtenerPorId(idUsuario)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/api/rut/{rutUsuario}")
+    @GetMapping("/rut/{rutUsuario}")
     public ResponseEntity<Usuario> obtenerPorRut(@PathVariable String rutUsuario) {
 
         return usuarioService.obtenerPorRut(rutUsuario)
@@ -47,7 +47,7 @@ public class UsuarioController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/api/correo/{correo}")
+    @GetMapping("/correo/{correo}")
     public ResponseEntity<Usuario> obtenerPorCorreo (@PathVariable String correo) {
 
         return usuarioService.obtenerPorCorreo(correo)
@@ -55,7 +55,7 @@ public class UsuarioController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping("/api/login")
+    @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody LoginRequestDTO request) {
 
         authenticationManager.authenticate(
